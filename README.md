@@ -1,50 +1,57 @@
 # Mothalali
 
-A tiny, toy Git-like project inspired by ugit, now implemented in Go.
+A tiny Git-like toy inspired by Nikita Leshenko’s ugit, rewritten with Go + Cobra.
 
 ## Requirements
-- Go 1.21+
+- Go 1.21+ (module targets Go 1.24)
 - macOS/Linux shell (examples use zsh/bash)
 
 ## Quickstart
 
-### Run without installing
+Run directly (no install):
 ```bash
-go run ./cmd/mothalali init
+go run . init
 ```
 
-### Build a binary
+Create a reusable binary:
 ```bash
-go build -o build/mothalali ./cmd/mothalali
+go build -o build/mothalali .
 ./build/mothalali init
 ```
 
-The command initializes a `.mothalali` directory in the current working directory (if it does not already exist) and prints its absolute path, mimicking the original Python behavior.
+Install globally (adds `mothalali` to your `$GOBIN` or `$GOPATH/bin`):
+```bash
+go install .
+mothalali init
+```
+
+## Commands
+- `mothalali init` – placeholder command demonstrating the CLI structure (currently prints “init called!!!”).
+- Future commands (`add`, `commit`, …) are scaffolded in `cmd/root.go`.
 
 ## Project layout
 ```
 .
 ├─ cmd/
-│  └─ mothalali/
-│     └─ main.go          # CLI entrypoint
-├─ internal/
-│  └─ mothalali/
-│     └─ repo.go          # Repository helpers
-├─ go.mod
+│  ├─ init.go        # init sub-command
+│  └─ root.go        # root command + scaffolding
+├─ main.go           # entrypoint (invokes cmd.Execute)
+├─ go.mod / go.sum
 ├─ README.md
-└─ build/                 # Created after go build
+└─ build/            # optional output from go build -o build/...
 ```
 
 ## Development
-- Format code:
+- Format / lint:
 ```bash
-gofmt -w cmd/mothalali internal/mothalali
-```
-- Run go vet / tests (none yet):
-```bash
+gofmt -w .
 go vet ./...
+```
+- Test (none yet, but keep command handy):
+```bash
 go test ./...
 ```
+- If you use cobra-cli helpers, ensure `go.mod` exists before running `cobra-cli init/add`.
 
 ## Reference
 - Git Internals by Nikita Leshenko: [ugit](https://www.leshenko.net/p/ugit/#)

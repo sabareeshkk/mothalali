@@ -17,7 +17,7 @@ var initCmd = &cobra.Command{
 Example:
   mothalali init`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+		fmt.Println("init called!!!")
 	},
 }
 
