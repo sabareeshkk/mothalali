@@ -1,57 +1,50 @@
 # Mothalali
 
-A tiny, toy Git-like project inspired by ugit.
+A tiny, toy Git-like project inspired by ugit, now implemented in Go.
 
 ## Requirements
-- Python >= 3.6
+- Go 1.21+
 - macOS/Linux shell (examples use zsh/bash)
 
 ## Quickstart
 
-1) Create and activate a virtual environment
+### Run without installing
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+go run ./cmd/mothalali init
 ```
 
-2) Install in editable mode
+### Build a binary
 ```bash
-python -m pip install -e .
+go build -o build/mothalali ./cmd/mothalali
+./build/mothalali init
 ```
 
-3) Run
-- Installed console script (recommended):
-```bash
-mothalali
-```
-- Or as a module from the project root:
-```bash
-python -m mothalali.cli
-```
+The command initializes a `.mothalali` directory in the current working directory (if it does not already exist) and prints its absolute path, mimicking the original Python behavior.
 
 ## Project layout
 ```
 .
-├─ setup.py
+├─ cmd/
+│  └─ mothalali/
+│     └─ main.go          # CLI entrypoint
+├─ internal/
+│  └─ mothalali/
+│     └─ repo.go          # Repository helpers
+├─ go.mod
 ├─ README.md
-├─ mothalali/
-│  ├─ __init__.py
-│  └─ cli.py
+└─ build/                 # Created after go build
 ```
 
 ## Development
-- Reinstall after changing entry points or package metadata:
+- Format code:
 ```bash
-python -m pip install -e .
+gofmt -w cmd/mothalali internal/mothalali
 ```
-- Upgrade build tooling if needed:
+- Run go vet / tests (none yet):
 ```bash
-python -m pip install --upgrade pip setuptools wheel
+go vet ./...
+go test ./...
 ```
-
-## Troubleshooting
-- Command not found after install: ensure your venv is active and reinstall with `-e .`.
-- Import errors from the repo root: use `python -m mothalali.cli` instead of `python mothalali/cli.py`.
 
 ## Reference
 - Git Internals by Nikita Leshenko: [ugit](https://www.leshenko.net/p/ugit/#)
