@@ -19,7 +19,8 @@ var hashObjectCmd = &cobra.Command{
 	Short: "creating SHA-1 of a file that given",
 	Long: `read the given file and saves it in the object store
 	Example:
-      mothalali hash-object <filename>`,
+      mothalali hash-object <filename>
+      mothalali hash-object <filename> -e blob`,
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		path := args[0]

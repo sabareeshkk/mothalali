@@ -41,6 +41,7 @@ var catFileCmd = &cobra.Command{
 	Long: `Shows the content of the file with the provided SHA-1 hash
 	Example:
 		mothalali cat-file <SHA-1_hash>
+		mothalali cat-file <SHA-1_hash> -e blob
 	`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
