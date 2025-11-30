@@ -4,35 +4,14 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"mothalali/internal"
 	"os"
-	"path/filepath"
-	"strconv"
 
 	"github.com/spf13/cobra"
 )
 
 var expected string
-
-func parseGitObject(object []byte) (objType string, size int, content []byte, err error) {
-	spaceIdx := bytes.IndexByte(object, ' ')
-	nullIdx := bytes.IndexByte(object, 0)
-	if spaceIdx == -1 || nullIdx == -1 || nullIdx < spaceIdx {
-		err = fmt.Errorf("invalid git object format")
-		return
-	}
-
-	objType = string(object[:spaceIdx])
-	sizeStr := string(object[spaceIdx+1 : nullIdx])
-	size, err = strconv.Atoi(sizeStr)
-	if err != nil {
-		return
-	}
-	content = object[nullIdx+1:]
-	return
-}
 
 // catFileCmd represents the catFile command
 var catFileCmd = &cobra.Command{
@@ -47,27 +26,13 @@ var catFileCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Expected value:", expected)
 		sha1_hash := args[0]
-		dir := filepath.Join(internal.ObjectsDir, sha1_hash[:2])
-		filepath := filepath.Join(dir, sha1_hash[2:])
-		content, err := os.ReadFile(filepath)
+		content, err := internal.ReadObject(sha1_hash, expected)
 		if err != nil {
-			fmt.Println("Error reading file:", err)
-			return
+			fmt.Println(err)
+			os.Exit(1)
 		}
-		objType, size, content, err := parseGitObject(content)
-		fmt.Println("objType:", objType, "size:", size)
-		if err != nil {
-			fmt.Println("Error parsing git object:", err)
-			return
-		}
-		if expected != "" && objType != expected {
-			fmt.Println("Unexpected object type:", objType)
-			return
-		}
-		if objType == "blob" {
+		if expected == "blob" {
 			fmt.Println(string(content))
-		} else {
-			fmt.Printf("Object type: %s, size: %d bytes\n", objType, size)
 		}
 	},
 }

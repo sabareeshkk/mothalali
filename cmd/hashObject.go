@@ -4,11 +4,8 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"crypto/sha1"
 	"fmt"
 	"mothalali/internal"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -27,35 +24,10 @@ var hashObjectCmd = &cobra.Command{
 		obj_type := args[1]
 
 		fmt.Println("given args:", path, obj_type)
-		if _, err := os.Stat(path); os.IsNotExist(err) {
-			fmt.Println("File not found:", path)
-			os.Exit(1)
+		if file_path, err := internal.HashObject(path, obj_type); err != nil {
+			cmd.PrintErrf("Error: %v", err)
 		} else {
-			b, err := os.ReadFile(path)
-			if err != nil {
-				fmt.Println("Error reading file:", err)
-				os.Exit(1)
-			}
-			var header []byte
-			header = fmt.Appendf(header, "%s %d\x00", obj_type, len(b))
-			b = append(header, b...)
-			hash := sha1.New()
-			hash.Write(b)
-			file_hash := hash.Sum(nil)
-			dir := filepath.Join(internal.ObjectsDir, fmt.Sprintf("%x", file_hash[:1]))
-			file_path := filepath.Join(dir, fmt.Sprintf("%x", file_hash[1:]))
-
-			// Ensure the directory exists
-			if err := os.MkdirAll(dir, 0755); err != nil {
-				fmt.Println("Error creating directory:", err)
-				os.Exit(1)
-			}
-			err = os.WriteFile(file_path, b, 0644)
-			if err != nil {
-				fmt.Println("Error writing file:", err)
-				os.Exit(1)
-			}
-			fmt.Printf("file_path: %s\n", file_path)
+			fmt.Println("successfully created:", file_path)
 		}
 	},
 }
