@@ -58,7 +58,7 @@ func HashObject(path string, obj_type string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(oid), nil
+	return fmt.Sprintf("%x", oid), nil
 }
 
 func parseGitObject(object []byte) (objType string, size int, content []byte, err error) {
@@ -101,7 +101,7 @@ func ReadObject(sha1_hash string, expected string) ([]byte, error) {
 
 // Implement logic to check if the path should be ignored
 func ignoredPath(path string) bool {
-	paths := []string{".git", ".mothalali"}
+	paths := []string{".git", ".mothalali", "build"}
 	if slices.Contains(paths, path) {
 		return true
 	}
@@ -169,4 +169,69 @@ func WriteTree(directoryPath string) (string, error) {
 		fmt.Println("Error hashing tree:", err)
 	}
 	return oid, nil
+}
+
+func parseTree(oid string) <-chan struct {
+	Type, Oid, Name string
+} {
+	ch := make(chan struct{ Type, Oid, Name string })
+	go func() {
+		defer close(ch)
+		if oid == "" {
+			return
+		}
+
+		data, err := ReadObject(oid, "tree")
+		if err != nil {
+			return
+		}
+
+		for line := range strings.SplitSeq(string(data), "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+
+			parts := strings.Fields(line)
+			if len(parts) < 3 {
+				continue
+			}
+			ch <- struct{ Type, Oid, Name string }{parts[0], parts[1], strings.Join(parts[2:], " ")}
+		}
+	}()
+
+	return ch
+}
+
+func getTree(oid string, basePath string) (index map[string]string) {
+	index = make(map[string]string)
+	getTreeInto(oid, basePath, index)
+	return index
+}
+
+func getTreeInto(oid string, basePath string, index map[string]string) (treePath map[string]string) {
+	treePath = make(map[string]string)
+	for entry := range parseTree(oid) {
+		fullPath := filepath.Join(basePath, entry.Name)
+		fmt.Println("fullPath:", fullPath, basePath)
+		if entry.Type == "tree" {
+			getTreeInto(entry.Oid, fullPath, index)
+		} else if entry.Type == "blob" {
+			index[fullPath] = entry.Oid
+		}
+	}
+	return treePath
+}
+
+func ReadTree(oid string) error {
+	treePath := getTree(oid, "./")
+	for path, oid := range treePath {
+		fmt.Println("Exact path:", path, oid)
+		content, err := ReadObject(oid, "blob")
+		if err != nil {
+			return err
+		}
+		fmt.Println("Content:", string(content))
+	}
+	return nil
 }
