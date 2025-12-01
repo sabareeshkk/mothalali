@@ -232,6 +232,13 @@ func ReadTree(oid string) error {
 			return err
 		}
 		fmt.Println("Content:", string(content))
+		dir := filepath.Dir(path)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err // handle error
+		}
+		if err := os.WriteFile(path, content, 0644); err != nil {
+			return err // handle error
+		}
 	}
 	return nil
 }
