@@ -6,7 +6,6 @@ package cmd
 import (
 	"fmt"
 	"mothalali/internal"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -29,11 +28,9 @@ var catFileCmd = &cobra.Command{
 		content, err := internal.ReadObject(sha1_hash, expected)
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			return
 		}
-		if expected == "blob" {
-			fmt.Println(string(content))
-		}
+		fmt.Println(string(content)) // print anyways
 	},
 }
 
