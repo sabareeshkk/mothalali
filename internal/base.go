@@ -51,6 +51,8 @@ func HashObject(path string, obj_type string) (string, error) {
 		}
 	case "tree":
 		content = []byte(path) // Converts string to byte slice
+	case "commit":
+		content = []byte(path) // Converts string to byte slice
 	default:
 		content = []byte(path) // Converts string to byte slice
 	}
@@ -241,4 +243,20 @@ func ReadTree(oid string) error {
 		}
 	}
 	return nil
+}
+
+func Commit(message string) (string, error) {
+	oid, err := WriteTree(".")
+	if err != nil {
+		fmt.Println("Error writing tree:", err)
+		return "", err
+	}
+	commit := "tree " + oid + "\n\n" + message + "\n"
+	fmt.Println(commit)
+	commitOid, err := HashObject(commit, "commit")
+	if err != nil {
+		return "", err
+	}
+	fmt.Println("commit called:---", commitOid)
+	return commitOid, nil
 }
