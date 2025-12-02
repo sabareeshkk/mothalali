@@ -4,6 +4,7 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"mothalali/internal"
 
 	"github.com/spf13/cobra"
@@ -19,7 +20,11 @@ var commitCmd = &cobra.Command{
 	snapshot the current directory using mothalali write-tree and save the resulting object`,
 	Example: "mothalai commit -m 'Initial commit'",
 	Run: func(cmd *cobra.Command, args []string) {
-		internal.Commit(message)
+		oid, err := internal.Commit(message)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Commit successful:", oid)
 	},
 }
 

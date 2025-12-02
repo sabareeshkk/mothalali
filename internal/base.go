@@ -258,5 +258,10 @@ func Commit(message string) (string, error) {
 		return "", err
 	}
 	fmt.Println("commit called:---", commitOid)
+	err = SetHead(commitOid)
+	if err != nil {
+		fmt.Println("Error writing head:", err)
+		return "", err
+	}
 	return commitOid, nil
 }
