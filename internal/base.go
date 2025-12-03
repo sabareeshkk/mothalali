@@ -311,25 +311,30 @@ func getCommit(oid string) (CommitDetails, error) {
 	return parseCommit(string(content)), nil
 }
 
-func GetCommit() {
-
-	headOid, err := GetHead()
-	if err != nil {
-		fmt.Println("Error getting head:", err)
-		return
-	}
-	for headOid != "" {
-		commitDetails, err := getCommit(headOid)
+func GetCommit(oid string) {
+	if oid == "" {
+		var err error
+		oid, err = GetHead()
 		if err != nil {
-			fmt.Println("Error getting commit:", err)
+			fmt.Println("error getting HEAD:", err)
 			return
 		}
-		fmt.Printf("commit %s\n\n", headOid)
-		// indent each line of the message by 4 spaces
-		indented := "    " + strings.ReplaceAll(commitDetails.Message, "\n", "\n    ")
-		fmt.Println(indented) // prints message with indentation
-		fmt.Println()         // prints an extra blank line
+	}
 
-		headOid = commitDetails.Parent
+	for oid != "" {
+		commit, err := getCommit(oid)
+		if err != nil {
+			fmt.Println("error getting commit:", err)
+			return
+		}
+
+		fmt.Printf("commit %s\n\n", oid)
+
+		// indent each line of the message by 4 spaces
+		indented := "    " + strings.ReplaceAll(commit.Message, "\n", "\n    ")
+		fmt.Println(indented)
+		fmt.Println()
+
+		oid = commit.Parent
 	}
 }
