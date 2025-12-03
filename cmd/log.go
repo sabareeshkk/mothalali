@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -9,34 +6,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var commitid string
+var commitID string
 
 // logCmd represents the log command
 var logCmd = &cobra.Command{
 	Use:   "log",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Show commit logs",
+	Long: `Show the commit logs for the current repository.
+You can specify a starting commit ID using the --commitid flag.`,
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		internal.GetCommit(commitid)
+		internal.GetCommit(commitID)
 	},
 }
 
 func init() {
-	logCmd.Flags().StringVarP(&commitid, "commitid", "c", "", "Commit object ID")
+	logCmd.Flags().StringVarP(&commitID, "commitid", "c", "", "Commit object ID")
 	rootCmd.AddCommand(logCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// logCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// logCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
