@@ -251,7 +251,6 @@ func Commit(message string) (string, error) {
 		fmt.Println("Error writing tree:", err)
 		return "", err
 	}
-	// TODO: get head commit
 	parentOid, err := GetHead()
 	if err != nil {
 		fmt.Println("Error getting head:", err)
@@ -277,4 +276,60 @@ func Commit(message string) (string, error) {
 		return "", err
 	}
 	return commitOid, nil
+}
+
+type CommitDetails struct {
+	Tree    string
+	Parent  string
+	Message string
+}
+
+func parseCommit(raw string) (c CommitDetails) {
+	parts := strings.SplitN(raw, "\n\n", 2) // [header, message]
+	header := parts[0]
+	if len(parts) == 2 {
+		c.Message = strings.TrimSpace(parts[1])
+	}
+
+	lines := strings.Split(header, "\n")
+
+	if len(lines) > 0 {
+		c.Tree = strings.TrimSpace(strings.TrimPrefix(lines[0], "tree "))
+	}
+	if len(lines) > 1 {
+		c.Parent = strings.TrimSpace(strings.TrimPrefix(lines[1], "parent "))
+	}
+	return
+}
+
+func getCommit(oid string) (CommitDetails, error) {
+
+	content, err := ReadObject(oid, "commit")
+	if err != nil {
+		return CommitDetails{}, err
+	}
+	return parseCommit(string(content)), nil
+}
+
+func GetCommit() {
+
+	headOid, err := GetHead()
+	if err != nil {
+		fmt.Println("Error getting head:", err)
+		return
+	}
+	for headOid != "" {
+		commitDetails, err := getCommit(headOid)
+		if err != nil {
+			fmt.Println("Error getting commit:", err)
+			return
+		}
+		fmt.Printf("commit %s\n\n", headOid)
+		// indent each line of the message by 4 spaces
+		indented := "    " + strings.ReplaceAll(commitDetails.Message, "\n", "\n    ")
+		fmt.Println(indented) // prints message with indentation
+		fmt.Println()         // prints an extra blank line
+
+		headOid = commitDetails.Parent
+	}
 }
