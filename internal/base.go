@@ -251,8 +251,21 @@ func Commit(message string) (string, error) {
 		fmt.Println("Error writing tree:", err)
 		return "", err
 	}
-	commit := "tree " + oid + "\n\n" + message + "\n"
-	fmt.Println(commit)
+	// TODO: get head commit
+	parentOid, err := GetHead()
+	if err != nil {
+		fmt.Println("Error getting head:", err)
+		return "", err
+	}
+	commit := "tree " + oid + "\n"
+
+	if parentOid != "" { // or whatever "exists" check you use
+		commit += "parent " + parentOid + "\n"
+	}
+
+	commit += "\n" + message + "\n"
+
+	fmt.Println("comit:", commit)
 	commitOid, err := HashObject(commit, "commit")
 	if err != nil {
 		return "", err
