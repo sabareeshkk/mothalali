@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"mothalali/internal"
 
 	"github.com/spf13/cobra"
 )
@@ -29,7 +30,9 @@ var checkoutCmd = &cobra.Command{
 		if createBranch != "" {
 			fmt.Printf("Creating new branch: %s\n", createBranch)
 		} else {
-			fmt.Printf("Checking out to: %s\n", args[0])
+			commitId := args[0]
+			fmt.Printf("Checking out to: %s\n", commitId)
+			internal.Checkout(commitId)
 		}
 	},
 }
