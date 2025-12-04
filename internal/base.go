@@ -213,9 +213,10 @@ func getTreeInto(oid string, basePath string, index map[string]string) (treePath
 	for entry := range parseTree(oid) {
 		fullPath := filepath.Join(basePath, entry.Name)
 		fmt.Println("fullPath:", fullPath, basePath)
-		if entry.Type == "tree" {
+		switch entry.Type {
+		case "tree":
 			getTreeInto(entry.Oid, fullPath, index)
-		} else if entry.Type == "blob" {
+		case "blob":
 			index[fullPath] = entry.Oid
 		}
 	}
