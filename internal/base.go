@@ -338,3 +338,13 @@ func GetCommit(oid string) {
 		oid = commit.Parent
 	}
 }
+
+func Checkout(oid string) {
+	commit, err := getCommit(oid)
+	if err != nil {
+		fmt.Println("error getting commit:", err)
+		return
+	}
+	ReadTree(commit.Tree)
+	SetHead(oid)
+}
