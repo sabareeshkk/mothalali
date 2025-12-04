@@ -346,3 +346,7 @@ func Checkout(oid string) {
 	ReadTree(commit.Tree)
 	SetHead(oid)
 }
+
+func Tag(tagName string, commitId string) {
+	// TODO: implement tag
+}
