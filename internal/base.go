@@ -96,7 +96,7 @@ func ReadObject(sha1_hash string, expected string) ([]byte, error) {
 		return nil, err
 	}
 	if expected != "" && objType != expected {
-		return nil, fmt.Errorf("Unexpected object type: %s", objType)
+		return nil, fmt.Errorf("unexpected object type: %s", objType)
 	}
 	return content, nil
 }
@@ -104,10 +104,7 @@ func ReadObject(sha1_hash string, expected string) ([]byte, error) {
 // Implement logic to check if the path should be ignored
 func ignoredPath(path string) bool {
 	paths := []string{".git", ".mothalali", "build"}
-	if slices.Contains(paths, path) {
-		return true
-	}
-	return false
+	return slices.Contains(paths, path)
 }
 
 // Each entry is [name, oid, objType]
