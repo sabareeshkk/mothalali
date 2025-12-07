@@ -38,3 +38,42 @@ func GetRef(ref string) (string, error) {
 	oid := strings.TrimSpace(string(content))
 	return oid, nil
 }
+
+type Ref struct {
+	Name string
+	OID  string
+}
+
+func IterRefs() <-chan Ref {
+	ch := make(chan Ref)
+
+	go func() {
+		defer close(ch)
+
+		// HEAD
+		if oid, err := GetRef("HEAD"); err == nil {
+			ch <- Ref{Name: "HEAD", OID: oid}
+		}
+
+		// refs/*
+		root := filepath.Join(GitDir, "refs")
+		filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+			if err != nil || d.IsDir() {
+				return err
+			}
+			rel, err := filepath.Rel(GitDir, path)
+			if err != nil {
+				return err
+			}
+			oid, err := GetRef(rel)
+			if err != nil {
+				return err
+			}
+			ch <- Ref{Name: rel, OID: oid}
+			return nil
+		})
+
+	}()
+
+	return ch
+}
