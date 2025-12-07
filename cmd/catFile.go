@@ -15,14 +15,15 @@ var catFileCmd = &cobra.Command{
 	Short: "shows the content of the file with the provided SHA-1 hash",
 	Long: `Shows the content of the file with the provided SHA-1 hash
 	Example:
-		mothalali cat-file <SHA-1_hash>
-		mothalali cat-file <SHA-1_hash> -e blob
+		mothalali cat-file <SHA-1_hash/tag-name>
+		mothalali cat-file <SHA-1_hash/tag-name> -e blob
 	`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Expected value:", expected)
-		sha1_hash := args[0]
-		content, err := internal.ReadObject(sha1_hash, expected)
+		hashOrName := args[0]
+		oid := internal.GetOid(hashOrName)
+		content, err := internal.ReadObject(oid, expected)
 		if err != nil {
 			fmt.Println(err)
 			return

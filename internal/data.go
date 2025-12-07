@@ -3,11 +3,15 @@ package internal
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
 func UpdateRef(ref string, oid string) error {
 	filePath := GitDir + "/" + ref
+	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
 	err := os.WriteFile(filePath, []byte(oid), 0644) // TODO: add meaningful name to variable 0644
 	if err != nil {
 		fmt.Println("Error writing file:", err)

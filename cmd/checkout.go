@@ -29,10 +29,12 @@ var checkoutCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if createBranch != "" {
 			fmt.Printf("Creating new branch: %s\n", createBranch)
+			// TODO: implement branch creation
 		} else {
 			commitId := args[0]
-			fmt.Printf("Checking out to: %s\n", commitId)
-			internal.Checkout(commitId)
+			oid := internal.GetOid(commitId)
+			fmt.Printf("Checking out to: %s\n", oid)
+			internal.Checkout(oid)
 		}
 	},
 }

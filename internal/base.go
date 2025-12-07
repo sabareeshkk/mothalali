@@ -344,12 +344,22 @@ func Checkout(oid string) {
 		return
 	}
 	ReadTree(commit.Tree)
-	UpdateRef("HEAD", oid)		
+	UpdateRef("HEAD", oid)
 }
 
-func Tag(tagName string, commitId string) {
+func CreateTag(tagName string, commitId string) {
 	if commitId == "" {
 		commitId, _ = GetRef("HEAD")
 	}
-	fmt.Println("tag called", tagName, "on commit", commitId)
+	path := TagsDir + "/" + tagName
+	UpdateRef(path, commitId)
+}
+
+func GetOid(name string) string {
+	oid, err := GetRef(name)
+	if err != nil {
+		fmt.Println("error getting oid:", err)
+		return ""
+	}
+	return oid
 }

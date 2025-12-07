@@ -17,9 +17,10 @@ var tagCmd = &cobra.Command{
 		tagName := args[0]
 		if len(args) == 2 {
 			commitId := args[1]
-			internal.Tag(tagName, commitId)
+			oid := internal.GetOid(commitId)
+			internal.CreateTag(tagName, oid)
 		} else {
-			internal.Tag(tagName, "")	
+			internal.CreateTag(tagName, "")
 		}
 	},
 }

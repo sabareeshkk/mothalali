@@ -16,13 +16,14 @@ var readTreeCmd = &cobra.Command{
 	Short: "restore to the commit-id",
 	Long: `This command restores the working directory to the state of the specified commit-id.
 	Example:
-		mothalali read-tree <commit-id>
+		mothalali read-tree <commit-id/tag-name>
 	`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("readTree called")
-		commitID := args[0]
-		internal.ReadTree(commitID)
+		name := args[0]
+		oid := internal.GetOid(name)
+		internal.ReadTree(oid)
 	},
 }
 
