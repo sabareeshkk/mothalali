@@ -356,10 +356,26 @@ func CreateTag(tagName string, commitId string) {
 }
 
 func GetOid(name string) string {
-	oid, err := GetRef(name)
-	if err != nil {
-		fmt.Println("error getting oid:", err)
-		return ""
+	// Name is ref
+	refs_to_try := []string{
+		name,
+		"refs/" + name,
+		"refs/tags/" + name,
+		"refs/heads/" + name,
 	}
-	return oid
+	for _, ref := range refs_to_try {
+		oid, err := GetRef(ref)
+		if err != nil {
+			fmt.Println("error getting oid:", err)
+			continue
+		}
+		return oid
+	}
+	// Verify it is hex
+	for _, c := range name {
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+			fmt.Printf("Invalid hex char: %c\n", c)
+		}
+	}
+	return name
 }
