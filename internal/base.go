@@ -356,6 +356,9 @@ func CreateTag(tagName string, commitId string) {
 }
 
 func GetOid(name string) string {
+	if name == "@" {
+		name = "HEAD"
+	}
 	// Name is ref
 	refs_to_try := []string{
 		name,

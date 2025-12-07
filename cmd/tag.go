@@ -15,13 +15,12 @@ var tagCmd = &cobra.Command{
 	Args: cobra.RangeArgs(1, 2),
 	Run: func(cmd *cobra.Command, args []string) {
 		tagName := args[0]
+		commitId := "@"
 		if len(args) == 2 {
-			commitId := args[1]
-			oid := internal.GetOid(commitId)
-			internal.CreateTag(tagName, oid)
-		} else {
-			internal.CreateTag(tagName, "")
+			commitId = args[1]
 		}
+		oid := internal.GetOid(commitId)
+		internal.CreateTag(tagName, oid)
 	},
 }
 

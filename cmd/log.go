@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"mothalali/internal"
 
 	"github.com/spf13/cobra"
@@ -18,14 +19,17 @@ You can specify a starting commit ID using the --commitid flag.`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if ref != "" {
+			fmt.Printf("Ref: %s\n", ref)
 			commitID = internal.GetOid(ref)
 		}
+		fmt.Printf("Commit ID: %s\n", commitID)
 		internal.GetCommit(commitID)
 	},
 }
 
 func init() {
 	logCmd.Flags().StringVarP(&commitID, "commitid", "c", "", "Commit object ID")
-	logCmd.Flags().StringVarP(&ref, "ref", "r", "", "Ref name")
+	logCmd.Flags().StringVarP(&ref, "ref", "r", "@", "Ref name")
+
 	rootCmd.AddCommand(logCmd)
 }
