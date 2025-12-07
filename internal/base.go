@@ -249,7 +249,7 @@ func Commit(message string) (string, error) {
 		fmt.Println("Error writing tree:", err)
 		return "", err
 	}
-	parentOid, err := GetHead()
+	parentOid, err := GetRef("HEAD")
 	if err != nil {
 		fmt.Println("Error getting head:", err)
 		return "", err
@@ -268,7 +268,7 @@ func Commit(message string) (string, error) {
 		return "", err
 	}
 	fmt.Println("commit called:---", commitOid)
-	err = SetHead(commitOid)
+	err = UpdateRef("HEAD", commitOid)
 	if err != nil {
 		fmt.Println("Error writing head:", err)
 		return "", err
@@ -312,7 +312,7 @@ func getCommit(oid string) (CommitDetails, error) {
 func GetCommit(oid string) {
 	if oid == "" {
 		var err error
-		oid, err = GetHead()
+		oid, err = GetRef("HEAD")
 		if err != nil {
 			fmt.Println("error getting HEAD:", err)
 			return
@@ -344,9 +344,12 @@ func Checkout(oid string) {
 		return
 	}
 	ReadTree(commit.Tree)
-	SetHead(oid)
+	UpdateRef("HEAD", oid)		
 }
 
 func Tag(tagName string, commitId string) {
-	// TODO: implement tag
+	if commitId == "" {
+		commitId, _ = GetRef("HEAD")
+	}
+	fmt.Println("tag called", tagName, "on commit", commitId)
 }

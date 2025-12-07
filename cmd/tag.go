@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"mothalali/internal"
 
 	"github.com/spf13/cobra"
 )
@@ -17,9 +17,9 @@ var tagCmd = &cobra.Command{
 		tagName := args[0]
 		if len(args) == 2 {
 			commitId := args[1]
-			fmt.Println("tag called", tagName, "on commit", commitId)
+			internal.Tag(tagName, commitId)
 		} else {
-			fmt.Println("tag called", tagName)
+			internal.Tag(tagName, "")	
 		}
 	},
 }
