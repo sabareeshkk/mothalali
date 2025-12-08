@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -89,8 +90,7 @@ func ReadObject(sha1_hash string, expected string) ([]byte, error) {
 		fmt.Println("Error reading file:", err)
 		return nil, err
 	}
-	objType, size, content, err := parseGitObject(content)
-	fmt.Println("objType:", objType, "size:", size)
+	objType, _, content, err := parseGitObject(content)
 	if err != nil {
 		fmt.Println("Error parsing git object:", err)
 		return nil, err
@@ -381,4 +381,59 @@ func GetOid(name string) string {
 		}
 	}
 	return name
+}
+
+func nextKey(m map[string]struct{}) (k string, ok bool) {
+	for key := range m {
+		delete(m, key)   // remove this key from the map
+		return key, true // return one key
+	}
+	return "", false // map is empty
+}
+
+func IterAncestors(s map[string]struct{}) <-chan string {
+	// deep copy
+	dst := make(map[string]struct{})
+	maps.Copy(dst, s)
+	visited := make(map[string]struct{})
+	ch := make(chan string)
+	go func() {
+		defer close(ch)
+		for len(dst) > 0 {
+			oid, ok := nextKey(dst)
+			if !ok {
+				break
+			}
+			if _, ok := visited[oid]; ok {
+				continue
+			}
+			if oid == "" {
+				continue
+			}
+			visited[oid] = struct{}{}
+			ch <- oid
+			commit, err := getCommit(oid)
+			if err != nil {
+				fmt.Println("error getting commit:", err)
+				return
+			}
+			dst[commit.Parent] = struct{}{}
+		}
+	}()
+	return ch
+}
+
+func IterCommitsAndParents(s map[string]struct{}) {
+	for oid := range IterAncestors(s) {
+		commit, err := getCommit(oid)
+		if err != nil {
+			fmt.Println("error getting commit:", err)
+			return
+		}
+		fmt.Println(oid)
+		if commit.Parent != "" {
+			fmt.Println("Parent", commit.Parent)
+		}
+	}
+	// TODO: draw the graph
 }
