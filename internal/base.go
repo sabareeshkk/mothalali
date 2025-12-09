@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"fmt"
-	"maps"
 	"os"
 	"path/filepath"
 	"slices"
 	"sort"
 	"strconv"
 	"strings"
+	"container/list"
 )
 
 func createHashObject(content []byte, objType string) (oid []byte, err error) {
@@ -318,8 +318,9 @@ func GetCommit(oid string) {
 			return
 		}
 	}
-
-	for oid != "" {
+	ancestors := map[string]struct{}{}
+	ancestors[oid] = struct{}{}
+	for oid := range IterAncestors(ancestors) {
 		commit, err := getCommit(oid)
 		if err != nil {
 			fmt.Println("error getting commit:", err)
@@ -332,8 +333,6 @@ func GetCommit(oid string) {
 		indented := "    " + strings.ReplaceAll(commit.Message, "\n", "\n    ")
 		fmt.Println(indented)
 		fmt.Println()
-
-		oid = commit.Parent
 	}
 }
 
@@ -392,18 +391,19 @@ func nextKey(m map[string]struct{}) (k string, ok bool) {
 }
 
 func IterAncestors(s map[string]struct{}) <-chan string {
+	dq := list.New()
+	for k := range s {
+		dq.PushBack(k)
+	}
 	// deep copy
-	dst := make(map[string]struct{})
-	maps.Copy(dst, s)
 	visited := make(map[string]struct{})
 	ch := make(chan string)
 	go func() {
 		defer close(ch)
-		for len(dst) > 0 {
-			oid, ok := nextKey(dst)
-			if !ok {
-				break
-			}
+		for dq.Len() > 0 {
+			front := dq.Front()
+			oid := front.Value.(string)
+			dq.Remove(front)
 			if _, ok := visited[oid]; ok {
 				continue
 			}
@@ -417,7 +417,7 @@ func IterAncestors(s map[string]struct{}) <-chan string {
 				fmt.Println("error getting commit:", err)
 				return
 			}
-			dst[commit.Parent] = struct{}{}
+			dq.PushFront(commit.Parent)
 		}
 	}()
 	return ch

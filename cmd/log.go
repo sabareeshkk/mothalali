@@ -16,6 +16,8 @@ var logCmd = &cobra.Command{
 	Short: "Show commit logs",
 	Long: `Show the commit logs for the current repository.
 You can specify a starting commit ID using the --commitid flag.`,
+	Example: `mothalali log --commitid <commitid>
+mothalali log --ref <ref>`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if ref != "" {
