@@ -423,17 +423,16 @@ func IterAncestors(s map[string]struct{}) <-chan string {
 	return ch
 }
 
-func IterCommitsAndParents(s map[string]struct{}) {
+func IterCommitsAndParents(s map[string]struct{}, dot *string) {
 	for oid := range IterAncestors(s) {
 		commit, err := getCommit(oid)
 		if err != nil {
 			fmt.Println("error getting commit:", err)
 			return
 		}
-		fmt.Println(oid)
+		*dot += fmt.Sprintf("\"%s\" [shape=box style=filled label=\"%s\"]\n", oid, oid[:10])
 		if commit.Parent != "" {
-			fmt.Println("Parent", commit.Parent)
+			*dot += fmt.Sprintf("\"%s\" -> \"%s\"\n", oid, commit.Parent)
 		}
 	}
-	// TODO: draw the graph
 }
